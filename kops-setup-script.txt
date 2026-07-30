@@ -1,6 +1,3 @@
-KOPS
-===
-
 Latest script
 ==============
 
@@ -123,119 +120,16 @@ echo "========================================"
 echo "Cluster Created Successfully"
 echo "========================================"
 
+=====================================================================================
 kubectl get nodes
 
 kops delete cluster --name  --yes
 
-=====================================================================================
-
-Launch Amazon Linux 2/ 2023 , t3.micro
-
-Attach a IAM ROLE TE=EC2, Permisions = admin
-
-vi .bashrc
-
-export PATH=$PATH:/usr/local/bin/
-
-
-source .bashrc
-
-ssh-keygen
-
-cp /root/.ssh/id_rsa.pub my-keypair.pub
-
-chmod 777 my-keypair.pub
-
-
-
-vi kops.sh
-
-curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-wget https://github.com/kubernetes/kops/releases/download/v1.32.0/kops-linux-amd64
-chmod +x kops-linux-amd64 kubectl
-mv kubectl /usr/local/bin/kubectl
-mv kops-linux-amd64 /usr/local/bin/kops
-aws s3api create-bucket --bucket rahul-kops-testbucket-new.k8s.local --region ap-south-1 --create-bucket-configuration LocationConstraint=ap-south-1
-aws s3api put-bucket-versioning --bucket rahul-kops-testbucket-new.k8s.local --region ap-south-1 --versioning-configuration Status=Enabled
-export KOPS_STATE_STORE=s3://rahul-kops-testbucket-new.k8s.local
-kops create cluster --name=rahul.k8s.local --zones=ap-south-1a,ap-south-1b --control-plane-count=1 --control-plane-size=m7i-flex.large --node-count=2 --node-size=m7i-flex.large --node-volume-size=40 --control-plane-volume-size=40 --ssh-public-key=my-keypair.pub --image=ami-0f918f7e67a3323f0 --networking=calico --topology=public
-kops update cluster --name rahul.k8s.local --yes --admin
 export KOPS_STATE_STORE=s3://rahul-kops-testbucket-new.k8s.local
 kops validate cluster --wait 10m
-
-wq!
-
-export KOPS_STATE_STORE=s3://rahul-kops-testbucket-new.k8s.local
-kops validate cluster --wait 10m
-
-
-
-Suggestions:
- * list clusters with: kops get cluster
- * edit this cluster with: kops edit cluster rahul.k8s.local
- * edit your node instance group: kops edit ig --name=rahul.k8s.local nodes-ap-south-1a
- * edit your control-plane instance group: kops edit ig --name=rahul.k8s.local control-plane-ap-south-1a
-
-
-
-
-
--- admin = Create/update cluster AND give kubectl admin credentials for this cluster.
-Creates kubeconfig file with cluster-admin role
-cat ~/.kube/config
-kind: ClusterRoleBinding
-roleRef:
-  name: cluster-admin
-I am cluster-admin because kOps configured RBAC + kubeconfig for me not that i am using ROOT user in EC2 for kubectl
-
-KOPS_STATE_STORE
----------------
-kOps stores Kubernetes cluster configuration in S3, while Kubernetes itself stores runtime state in etcd.
-kOps stores:
-
-Cluster configuration
-Terraform-like metadata
-Certificates
-Keys
-Instance group configs
-Kubernetes manifests
-
--- enough
-
-kops get cluster
-
-kubectl get nodes
-
-
-
-kops update cluster --name rahul.k8s.local --yes --admin
-kops rolling-update cluster
-
-
 
 if you want to delete :  kops delete cluster --name rahul.k8s.local --yes
 
 ----------------------------------------------------------------
-
-
-Calico is a powerful and widely used CNI plugin that provides:
-
-Networking (Pod-to-Pod communication across nodes)
-
-Network Policies (security rules to control traffic between pods)
-
-IP-in-IP / BGP Routing (for performance and scalability)
-
-High performance and low latency
-
-Security with encryption and policy enforcement
-
-🧠 Why use --networking=calico?
-✅ Well-supported and stable for production workloads
-
-✅ Allows fine-grained network policies
-
-✅ Works well in both public and private cloud environments
-
-✅ Fully integrated and supported by kops
+Fully integrated and supported by kops
 ------------------------------------------------------------------------
