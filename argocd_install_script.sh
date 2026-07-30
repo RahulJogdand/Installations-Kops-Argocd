@@ -39,3 +39,4 @@ echo "URL:      https://${NODE_IP}:${NODE_PORT}"
 echo "Username: admin"
 echo "Password: ${ADMIN_PASSWORD}"
 echo "=================================================="
+##kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'  #it will use for outside
